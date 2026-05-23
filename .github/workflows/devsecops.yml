@@ -35,7 +35,7 @@ jobs:
       run: pip install bandit
     - name: Execute Bandit Scan for Vulnerabilities (SQLi / Cleartext Keys Check)
       run: |
-        bandit -r app/ -ll -v
+        bandit -r . -ll -v
 
   docker-build:
     name: Container Security Scanning

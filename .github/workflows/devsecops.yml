@@ -1,40 +1,35 @@
-name: DevSecOps Secure CI/CD Pipeline
+name: DevSecOps Secure Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
   security-scans:
-    name: Code Quality & SAST Testing
+    name: Code Quality and SAST Testing
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-   - name: Set up Python Environment
-  uses: actions/setup-python@v5
-  with:
-    python-version: '3.11'
+    - name: Set up Python Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-
-    # 1. APPLICATION LINTING (Static Code Formatting Check)
-    - name: Install Linting Tools
+    - name: Install Testing Utilities
       run: |
         python -m pip install --upgrade pip
-        pip install flake8
+        pip install flake8 bandit
+
     - name: Run Flake8 Code Quality Scanner
       run: |
-        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
-    # 2. SAST SCANNING (Static Application Security Testing)
-    - name: Install Bandit Security Scanner
-      run: pip install bandit
-    - name: Execute Bandit Scan for Vulnerabilities (SQLi / Cleartext Keys Check)
+    - name: Execute Bandit SAST Vulnerability Scan
       run: |
         bandit -r . -ll -v
 
@@ -47,8 +42,7 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v4
 
-    # 3. CONTAINER SCANNING (Scans Dockerfile layers for infrastructure leaks)
-    - name: Run Aqua Security Trivy Scanner
+    - name: Run Trivy Filesystem Security Assessment
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
